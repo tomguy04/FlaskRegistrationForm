@@ -44,7 +44,7 @@ from datetime import datetime
 #1
 @app.route('/')
 def index():
-  session['date'] =  datetime.now().strftime("%m/%d/%Y")
+  #session['date'] =  datetime.now().strftime("%m/%d/%Y")
   return render_template("form.html")
 
 # this route will handle our form submission
@@ -58,7 +58,9 @@ def data():
   lname = request.form['lastname']
   session['pw'] = request.form['password']
   confPw = request.form['confpassword']
-  bady = request.form['bday']
+  bday = request.form['bday']
+  mydate = datetime.now()
+  
   print "*" * 80, myemail
   print "*", fname
   print "*", lname
@@ -77,6 +79,7 @@ def data():
   #9ABCDEFGh
   PW_U_REGEX = re.compile(r'^[a-zA-Z0-9.+_-]*[A-Z]+[a-zA-Z0-9.+_-]*$')
   PW_NUM_REGEX = re.compile(r'^[a-zA-Z0-9.+_-]*[0-9]+[a-zA-Z0-9.+_-]*$')
+  #BDAY_VALID_REGEX = re.compile(r'^[0-9]{2}/{1}[0-9]{2}/{1}[0-9]{4}$')
   BDAY_VALID_REGEX = re.compile(r'^[0-9]{2}\/{1}[0-9]{2}\/[0-9]{4}$')
   
   if len(request.form['email']) < 1 or len(fname) < 1 or len(lname) < 1 or len (session['pw']) < 1 or len(confPw) < 1 :
@@ -105,7 +108,10 @@ def data():
     flash(u"Passwords do NOT match",'flashErrorMessages')
     return redirect('/')  
   elif not BDAY_VALID_REGEX.match(request.form['bday']):
-    flash(u"please enter a valid bady",'flashErrorMessages')
+    flash(u"please enter a valid bday",'flashErrorMessages')
+    return redirect('/')
+  elif datetime.strptime(request.form['bday'], "%m/%d/%Y") >= mydate :
+    flash(u'You can\'t be born in the future or today!','flashErrorMessages')
     return redirect('/')
   else:
     flash(u'Thanks for submitting your information', 'flashNoErrorMessages')
